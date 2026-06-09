@@ -1,0 +1,56 @@
+# Crypto-focused keyword discovery queries for fetch_search.py
+#
+# 役割: これは「発見(discovery)」用ストリーム。業界動向の主軸は
+#       config/source_accounts.yaml（信頼ソースの from:<handle>）側で確保し、
+#       こちらは allowlist 外で話題化しているニュースを拾う補助。
+#
+# 設計上の注意:
+#   X SearchTimeline は `(A OR B OR C) min_faves:N lang:en -filter:replies` のような
+#   複合クエリだと 200 OK で結果 0 件になることがある。シンプルな
+#   `<keyword> min_faves:N` 形式は動くため、キーワードごとに 1 クエリにしている。
+#
+#   filter:links — 記事/発表リンク付きに寄せ、インプレ稼ぎ(画像/煽りのみ)を弱める。
+#     ※ もし結果が極端に減る/0になる場合は filter:links を外す（ログの +N で確認）。
+#   min_faves   — いいね閾値。インプレゾンビはいいねを稼ぐので、これ単独に頼らない。
+#   product: Latest = 時系列（「今 X で話題」を取り、--max-age-hours で更にカット）
+
+defaults:
+  count: 80
+  product: Latest
+
+queries:
+  # --- 英語: 銘柄 ---
+  - label: en-bitcoin
+    query: 'bitcoin min_faves:1000 filter:links'
+  - label: en-ethereum
+    query: 'ethereum min_faves:1000 filter:links'
+  - label: en-solana
+    query: 'solana min_faves:600 filter:links'
+  - label: en-xrp
+    query: 'XRP min_faves:600 filter:links'
+
+  # --- 英語: テーマ ---
+  - label: en-defi
+    query: 'DeFi min_faves:600 filter:links'
+  - label: en-stablecoin
+    query: 'stablecoin min_faves:400 filter:links'
+  - label: en-web3
+    query: 'web3 min_faves:600 filter:links'
+  - label: en-ecosystem-base
+    query: 'Coinbase min_faves:600 filter:links'
+
+  # --- 日本語: 銘柄 ---
+  - label: ja-bitcoin
+    query: 'ビットコイン min_faves:100 filter:links'
+  - label: ja-ethereum
+    query: 'イーサリアム min_faves:100 filter:links'
+  - label: ja-crypto
+    query: '仮想通貨 min_faves:100 filter:links'
+  - label: ja-asset
+    query: '暗号資産 min_faves:80 filter:links'
+
+  # --- 日本語: テーマ ---
+  - label: ja-defi
+    query: 'DeFi 仮想通貨 min_faves:50 filter:links'
+  - label: ja-nft
+    query: 'NFT 暗号資産 min_faves:50 filter:links'

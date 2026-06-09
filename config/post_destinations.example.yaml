@@ -1,0 +1,33 @@
+# 投稿先カスタマイズ設定
+# コピー: cp config/post_destinations.example.yaml config/post_destinations.yaml
+# シークレットは環境変数でも設定可能: SLACK_WEBHOOK_URL, DISCORD_WEBHOOK_URL など
+
+destinations:
+  # Slack - Incoming Webhook
+  # https://api.slack.com/messaging/webhooks
+  slack:
+    enabled: true
+    webhook_url: "${SLACK_WEBHOOK_URL}"  # 環境変数を使用する場合
+    # webhook_url: "https://hooks.slack.com/services/T00/B00/xxx"  # 直接指定
+    channel: "#twitter-digest"  # Webhook 作成時に指定したチャンネル
+
+  # Discord - Webhook
+  # https://discord.com/developers/docs/resources/webhook
+  discord:
+    enabled: true
+    webhook_url: "${DISCORD_WEBHOOK_URL}"
+    # webhook_url: "https://discord.com/api/webhooks/123/abc"
+    # 音声ブリーフィングを自動生成して添付する場合
+    generate_audio: false
+    audio_voice: "nova"  # alloy, echo, fable, onyx, nova, shimmer
+
+  # カスタム Webhook - 任意の HTTP エンドポイント
+  webhook:
+    enabled: false
+    url: "${CUSTOM_WEBHOOK_URL}"
+    # POST される JSON: {"title": "Twitter Digest", "content": "..."}
+
+  # ファイル出力（従来の動作）
+  file:
+    enabled: true
+    path: "output/digest.md"

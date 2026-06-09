@@ -1,0 +1,29 @@
+# Data files (may contain sensitive info)
+data/
+*.json
+!package.json
+
+# Auth tokens
+.env
+*.env
+
+# Post destination config (may contain webhook URLs)
+config/post_destinations.yaml
+
+# Audio files (generated)
+*.mp3
+*.wav
+*.spoken.txt
+
+# Temp files
+/tmp/
+*.tmp
+
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

@@ -1,0 +1,70 @@
+# 業界動向ソースのキュレーション allowlist（叩き台 / 自由に追加・削除してください）
+#
+# 使い方:
+#   - fetch_search.py --accounts-file がこれを読み、`from:<handle> -filter:replies`
+#     で各アカウントの最近の投稿を取得（いいね数に関係なく拾う＝一次情報重視）。
+#   - build_simple_digest.py --accounts-file が「信頼ソース加点」と
+#     「品質加重モメンタム（ゾンビ群の水増し無効化）」に使用。
+#
+# handle は @ 抜きのスクリーンネーム（大小無視）。実在性・最新ハンドルは要確認。
+# count: 1アカウントあたりの取得目標（少なめでOK。--max-age-hours でさらにカット）。
+
+defaults:
+  count: 15
+
+accounts:
+  # --- メディア / ニュース ---
+  - {handle: coindesk, category: media}
+  - {handle: Cointelegraph, category: media}
+  - {handle: TheBlock__, category: media}
+  - {handle: decryptmedia, category: media}
+  - {handle: Blockworks_, category: media}
+  - {handle: BanklessHQ, category: media}
+
+  # --- 記者 / アナリスト ---
+  - {handle: laurashin, category: journalist}
+  - {handle: nikhileshde, category: journalist}
+  - {handle: RyanSAdams, category: analyst}
+  - {handle: TrustlessState, category: analyst}
+
+  # --- リサーチ / オンチェーン分析 ---
+  - {handle: MessariCrypto, category: research}
+  - {handle: Delphi_Digital, category: research}
+  - {handle: tarunchitra, category: research}
+  - {handle: glassnode, category: data}
+  - {handle: santimentfeed, category: data}
+  - {handle: nansen_ai, category: data}
+  - {handle: ArkhamIntel, category: data}
+  - {handle: Dune, category: data}
+  - {handle: zachxbt, category: investigator}
+
+  # --- 創業者 / ビルダー ---
+  - {handle: VitalikButerin, category: founder}
+  - {handle: haydenzadams, category: founder}
+  - {handle: StaniKulechov, category: founder}
+  - {handle: gakonst, category: founder}
+  - {handle: saylor, category: founder}
+  - {handle: brian_armstrong, category: founder}
+  - {handle: jessepollak, category: founder}
+  - {handle: balajis, category: founder}
+
+  # --- VC ---
+  - {handle: a16zcrypto, category: vc}
+  - {handle: paradigm, category: vc}
+  - {handle: cdixon, category: vc}
+  - {handle: PanteraCapital, category: vc}
+  - {handle: VariantFund, category: vc}
+
+  # --- プロトコル / 取引所 公式 ---
+  - {handle: ethereum, category: protocol}
+  - {handle: solana, category: protocol}
+  - {handle: Uniswap, category: protocol}
+  - {handle: chainlink, category: protocol}
+  - {handle: circle, category: exchange}
+  - {handle: paoloardoino, category: exchange}
+  - {handle: coinbase, category: exchange}
+  - {handle: krakenfx, category: exchange}
+  - {handle: binance, category: exchange}
+
+  # --- 規制 / 政策 ---
+  - {handle: SECGov, category: policy}
