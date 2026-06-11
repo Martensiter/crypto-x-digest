@@ -48,7 +48,7 @@ ct0=<128-char-hex>
 export X_AUTH_TOKEN="<token>"
 export X_CT0="<token>"
 
-cd /Users/dnazarov/code/twitter-monitor
+# from the repository root
 python scripts/fetch_timeline.py --count 500 --output data/tweets_raw.json
 ```
 
