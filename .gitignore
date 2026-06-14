@@ -27,3 +27,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Keep Claude Code task/session config tracked despite the broad *.json rule above
+!.claude/settings.json
+!.claude/tasks.json

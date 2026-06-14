@@ -1,0 +1,13 @@
+# Notify Slack on push. Excludes the auto-checkpoint branches the Stop hook
+# force-pushes (wip/checkpoint/**) to avoid notification spam.
+name: Notify on Push
+
+on:
+  push:
+    branches-ignore:
+      - 'wip/checkpoint/**'
+
+jobs:
+  notify:
+    uses: ./.github/workflows/notify-slack-reusable.yml
+    secrets: inherit
