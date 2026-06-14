@@ -1,0 +1,16 @@
+# gitleaks configuration. Keeps ALL default rules (real new secrets still
+# caught) and allowlists one known false positive: the PUBLIC X.com
+# web-client bearer token quoted in the API reverse-engineering doc. That
+# token is a hard-coded public constant shipped in every x.com page (used by
+# all X scrapers), not a user credential — the real per-user secrets in that
+# doc are placeholders (YOUR_AUTH_TOKEN / YOUR_CT0_TOKEN).
+title = "crypto-x-digest"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public X.com web-client bearer token in API docs"
+paths = [
+  '''docs/x-api-reverse-engineering\.md$''',
+]
