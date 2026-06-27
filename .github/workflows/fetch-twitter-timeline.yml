@@ -5,9 +5,12 @@
 name: Fetch Twitter Timeline
 
 on:
+  # 毎日の発火は Claude Code Routine に移行（GHA 実行分を消費しないため）。詳細は ROUTINE.md。
+  # GHA はフォールバック用に手動実行 (workflow_dispatch) のみ残す。Routine が長期間落ちる
+  # 等で GHA cron を復活させたい場合は下の schedule のコメントを外す。
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *"  # 毎日 0:00 UTC = 9:00 JST
+  # schedule:
+  #   - cron: "0 0 * * *"  # 毎日 0:00 UTC = 9:00 JST
 
 jobs:
   fetch-and-post:
