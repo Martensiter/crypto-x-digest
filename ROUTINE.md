@@ -55,9 +55,15 @@ Routine（毎日, 依存はエージェントが手順1で導入）
 1. `pip install pyyaml` を実行し、`git pull origin <このリポジトリの作業ブランチ>` で最新化する。
 2. 取得: `mkdir -p data && python3 scripts/fetch_search.py --queries-file config/search_queries.yaml
    --accounts-file config/source_accounts.yaml --max-age-hours 48 --output data/tweets.json`
-   - data/tweets.json が無い / 0件 / fetch がエラー（401 等）なら、X_AUTH_TOKEN・X_CT0 失効の
-     可能性が高い。DISCORD_BRIDGE_URL に「⚠️ Token期限切れ通知（x.com の Cookie から再取得して
-     Routine env を更新してください）」を POST し、ここで終了する。
+   - fetch の stderr を必ず確認し、**原因で切り分ける**（0件＝即トークン失効と決めつけない）:
+     - `HTTP 401` / `HTTP 403` → X_AUTH_TOKEN・X_CT0 失効。Discord に「⚠️ Token期限切れ（x.com の
+       Cookie から auth_token/ct0 を再取得して Routine env を更新）」を POST して終了。
+     - `HTTP 400` / `HTTP 422`（`GRAPHQL_VALIDATION_FAILED`）→ **トークンは無実**。X のスキーマ変更で
+       `scripts/fetch_search.py` の `FEATURES`/`variables`/`X_SEARCH_QUERY_ID` が古い。Discord に
+       「⚠️ X スクレイパが古い（features/queryId 要更新。Cookie 取り直しでは直らない）」を POST して終了。
+     - ネットワーク例外・その他のエラー → Discord にエラー要旨を POST して終了。
+     - エラー無しで data/tweets.json が **0件** → 単にヒット無し。Discord に「本日は対象ツイート 0 件」を
+       POST して終了（警告ではない）。
 3. 整形パイプライン（GHA と同じ）:
    a. `python3 scripts/extract_topics.py data/tweets.json --output data/enriched.json --force-topic crypto`
    b. `python3 scripts/filter_promotional.py data/enriched.json --output data/filtered.json --stats`
@@ -74,7 +80,8 @@ Routine（毎日, 依存はエージェントが手順1で導入）
 6. 「取得件数 / クラスタ数 / 投稿チャンク数 / 翻訳の成否」を1行で報告して終了する。
 
 注意: data/ への変更はコミット不要（ダイジェストは Discord 投稿が本番。リポジトリには残さなくてよい）。
-トークン失効や 0 件のときは無理に投稿せず、警告を出して終了すること。
+fetch がエラー（401/403=トークン、400/422=スクレイパ定義が古い、その他）や 0 件のときは、上の手順2の
+切り分けに従って**原因別の**メッセージを Discord に出して終了すること（ダイジェストは作らない）。
 ```
 
 ## GHA との関係

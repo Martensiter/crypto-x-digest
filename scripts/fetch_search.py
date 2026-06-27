@@ -40,14 +40,23 @@ BEARER = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk
 # X rotates the GraphQL queryId for SearchTimeline. Override via env var if it 404s.
 # `or` (not `get(..., default)`) — GHA passes an empty string for an unset secret,
 # which would otherwise bypass the fallback and produce qid= in the request URL.
-SEARCH_QUERY_ID = os.environ.get("X_SEARCH_QUERY_ID") or "4fpceYZ6-YQCx_JSl_Cn_A"
+# IMPORTANT: queryId, FEATURES, and `variables` are a MATCHED SET from one x.com
+# frontend bundle. On HTTP 400/422 GRAPHQL_VALIDATION_FAILED, re-capture all three
+# together from a live SearchTimeline request (DevTools → Network → Payload), not
+# just the queryId. Default below + FEATURES + variables were copied 1:1 from a live
+# bundle (refresh them together when X changes its schema).
+SEARCH_QUERY_ID = os.environ.get("X_SEARCH_QUERY_ID") or "gKia-nBM9kwuDEfSDeWMfQ"
 ENDPOINT_TEMPLATE = "https://x.com/i/api/graphql/{qid}/SearchTimeline"
 
+# Copied 1:1 from a live x.com SearchTimeline request (DevTools → Network → Payload).
+# Must match the queryId above and the `variables` below (same bundle). When X adds/
+# removes a feature flag you get HTTP 400/422 GRAPHQL_VALIDATION_FAILED — re-capture.
 FEATURES = {
     "rweb_video_screen_enabled": False,
+    "rweb_cashtags_enabled": True,
     "profile_label_improvements_pcf_label_in_post_enabled": True,
     "responsive_web_profile_redirect_enabled": False,
-    "rweb_tipjar_consumption_enabled": True,
+    "rweb_tipjar_consumption_enabled": False,
     "verified_phone_label_enabled": False,
     "creator_subscriptions_tweet_preview_api_enabled": True,
     "responsive_web_graphql_timeline_navigation_enabled": True,
@@ -57,28 +66,30 @@ FEATURES = {
     "c9s_tweet_anatomy_moderator_badge_enabled": True,
     "responsive_web_grok_analyze_button_fetch_trends_enabled": False,
     "responsive_web_grok_analyze_post_followups_enabled": True,
+    "rweb_cashtags_composer_attachment_enabled": True,
     "responsive_web_jetfuel_frame": True,
     "responsive_web_grok_share_attachment_enabled": True,
-    "responsive_web_grok_annotations_enabled": False,
+    "responsive_web_grok_annotations_enabled": True,
     "articles_preview_enabled": True,
     "responsive_web_edit_tweet_api_enabled": True,
+    "rweb_conversational_replies_downvote_enabled": False,
     "graphql_is_translatable_rweb_tweet_is_translatable_enabled": True,
     "view_counts_everywhere_api_enabled": True,
     "longform_notetweets_consumption_enabled": True,
     "responsive_web_twitter_article_tweet_consumption_enabled": True,
-    "tweet_awards_web_tipping_enabled": False,
+    "content_disclosure_indicator_enabled": True,
+    "content_disclosure_ai_generated_indicator_enabled": True,
     "responsive_web_grok_show_grok_translated_post": True,
     "responsive_web_grok_analysis_button_from_backend": True,
-    "post_ctas_fetch_enabled": True,
-    "creator_subscriptions_quote_tweet_preview_enabled": False,
+    "post_ctas_fetch_enabled": False,
     "freedom_of_speech_not_reach_fetch_enabled": True,
     "standardized_nudges_misinfo": True,
     "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": True,
     "longform_notetweets_rich_text_read_enabled": True,
-    "longform_notetweets_inline_media_enabled": True,
+    "longform_notetweets_inline_media_enabled": False,
     "responsive_web_grok_image_annotation_enabled": True,
     "responsive_web_grok_imagine_annotation_enabled": True,
-    "responsive_web_grok_community_note_auto_translation_is_enabled": False,
+    "responsive_web_grok_community_note_auto_translation_is_enabled": True,
     "responsive_web_enhance_cards_enabled": False,
 }
 
@@ -192,6 +203,9 @@ def fetch_one_query(
             "querySource": "typed_query",
             "product": product,
             "withGrokTranslatedBio": False,
+            # SearchTimeline now declares this variable; its absence triggers
+            # GRAPHQL_VALIDATION_FAILED. Keep in sync with the live bundle.
+            "withQuickPromoteEligibilityTweetFields": False,
         }
         if cursor:
             variables["cursor"] = cursor
@@ -217,8 +231,16 @@ def fetch_one_query(
                     f"Current: {SEARCH_QUERY_ID}. Set X_SEARCH_QUERY_ID secret to override.",
                     file=sys.stderr,
                 )
-            if e.code == 401:
-                print("  → Auth tokens expired. Re-extract from browser.", file=sys.stderr)
+            if e.code in (400, 422):
+                print(
+                    "  → GRAPHQL_VALIDATION_FAILED: request shape is stale vs X's current "
+                    "schema (FEATURES / variables / queryId out of sync) — NOT an auth problem. "
+                    "Re-capture features+variables+queryId from a live x.com SearchTimeline "
+                    "request (DevTools → Network → Payload) and update FEATURES / X_SEARCH_QUERY_ID.",
+                    file=sys.stderr,
+                )
+            if e.code in (401, 403):
+                print("  → Auth tokens (X_AUTH_TOKEN / X_CT0) expired. Re-extract from browser.", file=sys.stderr)
             break
         except Exception as e:
             print(f"  Network exception: {e}", file=sys.stderr)
