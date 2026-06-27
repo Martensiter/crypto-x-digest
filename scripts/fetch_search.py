@@ -45,7 +45,7 @@ BEARER = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk
 # together from a live SearchTimeline request (DevTools → Network → Payload), not
 # just the queryId. Default below + FEATURES + variables were copied 1:1 from a live
 # bundle (refresh them together when X changes its schema).
-SEARCH_QUERY_ID = os.environ.get("X_SEARCH_QUERY_ID") or "gKia-nBM9kwuDEfSDeWMfQ"
+SEARCH_QUERY_ID = os.environ.get("X_SEARCH_QUERY_ID") or "Bcw3RzK-PatNAmbnw54hFw"
 ENDPOINT_TEMPLATE = "https://x.com/i/api/graphql/{qid}/SearchTimeline"
 
 # Copied 1:1 from a live x.com SearchTimeline request (DevTools → Network → Payload).
