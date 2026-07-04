@@ -27,7 +27,10 @@ jobs:
         env:
           X_AUTH_TOKEN: ${{ secrets.X_AUTH_TOKEN }}
           X_CT0: ${{ secrets.X_CT0 }}
-          X_SEARCH_QUERY_ID: ${{ secrets.X_SEARCH_QUERY_ID }}
+          # X_SEARCH_QUERY_ID は渡さない — queryId/FEATURES/variables は同一バンドルの
+          # マッチドセットでコードが正本 (ROUTINE.md「queryId はコードが正本」参照)。
+          # 古い Secret がコードの正しい既定を上書きして GRAPHQL_VALIDATION_FAILED を
+          # 起こした実績があるため、フォールバック経路でも env 注入しない。
         run: |
           mkdir -p data
           python3 scripts/fetch_search.py \
