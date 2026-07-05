@@ -45,7 +45,16 @@ BEARER = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk
 # together from a live SearchTimeline request (DevTools → Network → Payload), not
 # just the queryId. Default below + FEATURES + variables were copied 1:1 from a live
 # bundle (refresh them together when X changes its schema).
-SEARCH_QUERY_ID = os.environ.get("X_SEARCH_QUERY_ID") or "Bcw3RzK-PatNAmbnw54hFw"
+_DEFAULT_QUERY_ID = "Bcw3RzK-PatNAmbnw54hFw"
+SEARCH_QUERY_ID = os.environ.get("X_SEARCH_QUERY_ID") or _DEFAULT_QUERY_ID
+if SEARCH_QUERY_ID != _DEFAULT_QUERY_ID:
+    print(
+        f"WARNING: X_SEARCH_QUERY_ID env override in effect ({SEARCH_QUERY_ID!r} != "
+        f"code default {_DEFAULT_QUERY_ID!r}). queryId/FEATURES/variables are a matched "
+        "set from one bundle — a stale override causes GRAPHQL_VALIDATION_FAILED. "
+        "Unset the env var unless you re-captured all three together.",
+        file=sys.stderr,
+    )
 ENDPOINT_TEMPLATE = "https://x.com/i/api/graphql/{qid}/SearchTimeline"
 
 # Copied 1:1 from a live x.com SearchTimeline request (DevTools → Network → Payload).
