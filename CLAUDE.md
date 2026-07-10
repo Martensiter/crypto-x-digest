@@ -18,6 +18,10 @@ Two environment variables must be set:
 
 ### Extracting Tokens via agent-browser
 
+> **Local (macOS) only** — this flow drives the user's desktop Chrome and does
+> not work in headless environments (Routine / CI / remote sessions). There,
+> `X_AUTH_TOKEN` / `X_CT0` must be provided as environment variables.
+
 If tokens are not set, connect to Chrome and extract them:
 
 ```bash
