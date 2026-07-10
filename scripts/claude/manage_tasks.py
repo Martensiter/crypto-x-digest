@@ -2,8 +2,8 @@
 """
 Claude Code 用タスクキュー管理。
 
-レート制限で中断されたタスクを保存し、制限解除後に自動再開するための仕組み。
-タスクは .claude/tasks.json に保存され、GitHub Actions の claude-auto-resume.yml で処理される。
+セッションをまたぐタスクの引き継ぎ用キュー。タスクは .claude/tasks.json に保存され、
+SessionStart フック (.claude/hooks/session_start.sh) が未完了タスクを表示する。
 
 Usage:
   # タスクを追加

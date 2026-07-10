@@ -1,4 +1,12 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(python scripts/*)",
+      "Bash(python3 scripts/*)",
+      "Bash(pip install *)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
