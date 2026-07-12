@@ -15,7 +15,8 @@ jobs:
   notify-failure:
     needs: ci
     if: failure()
-    uses: ./.github/workflows/notify-slack-reusable.yml
+    uses: ./.github/workflows/notify-discord-reusable.yml
     with:
-      custom_text: ":x: CI failed on `${{ github.ref_name }}` — ${{ github.repository }}"
+      channel: alerts
+      custom_text: "❌ CI failed on `${{ github.ref_name }}` — ${{ github.repository }}"
     secrets: inherit

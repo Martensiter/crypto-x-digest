@@ -1,0 +1,73 @@
+# Reusable Discord notification.
+# Call from another workflow:
+#   jobs:
+#     notify:
+#       uses: ./.github/workflows/notify-discord-reusable.yml
+#       with:
+#         channel: alerts   # push (default) | alerts | routine
+#       secrets: inherit
+# Requires repo secrets (Discord webhook URLs, one per channel):
+#   DISCORD_WEBHOOK_PUSH / DISCORD_WEBHOOK_ALERTS / DISCORD_WEBHOOK_ROUTINE
+# No-op when the selected webhook is unset.
+# Optional secret DISCORD_MENTION_ID: Discord user ID to @mention on channel=alerts.
+name: Notify Discord (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      custom_text:
+        description: 'Header line; overrides the default "<repo> (<branch>) — <event> by <actor>" context. The run link is always appended.'
+        required: false
+        type: string
+      channel:
+        description: 'Destination channel: push | alerts | routine'
+        required: false
+        type: string
+        default: 'push'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        env:
+          WEBHOOK_PUSH: ${{ secrets.DISCORD_WEBHOOK_PUSH }}
+          WEBHOOK_ALERTS: ${{ secrets.DISCORD_WEBHOOK_ALERTS }}
+          WEBHOOK_ROUTINE: ${{ secrets.DISCORD_WEBHOOK_ROUTINE }}
+          MENTION_ID: ${{ secrets.DISCORD_MENTION_ID }}
+          CHANNEL: ${{ inputs.channel }}
+          CUSTOM: ${{ inputs.custom_text }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          EVENT: ${{ github.event_name }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$CHANNEL" in
+            alerts)  WEBHOOK="$WEBHOOK_ALERTS" ;;
+            routine) WEBHOOK="$WEBHOOK_ROUTINE" ;;
+            *)       WEBHOOK="$WEBHOOK_PUSH" ;;
+          esac
+          if [ -z "$WEBHOOK" ]; then
+            echo "Discord webhook for channel '$CHANNEL' not set — skipping notification."
+            exit 0
+          fi
+          if [ -n "$CUSTOM" ]; then
+            HEADER="$CUSTOM"
+          else
+            HEADER="**${REPO}** (\`${BRANCH}\`) — ${EVENT} by ${ACTOR}"
+            if [ -n "$COMMIT_MSG" ]; then
+              FIRST_LINE="${COMMIT_MSG%%$'\n'*}"
+              HEADER="${HEADER}"$'\n'"> ${FIRST_LINE}"
+            fi
+          fi
+          MSG="${HEADER}"$'\n'"[View run](<${RUN_URL}>)"
+          if [ "$CHANNEL" = "alerts" ] && [ -n "$MENTION_ID" ]; then
+            MSG="<@${MENTION_ID}> ${MSG}"
+          fi
+          printf '%s' "$MSG" > /tmp/discord_msg.txt
+          # Discord content is capped at 2000 chars
+          payload=$(jq -n --rawfile m /tmp/discord_msg.txt \
+            '{content: ($m | if length > 2000 then .[:1997] + "..." else . end)}')
+          curl -s -X POST -H "Content-Type: application/json" -d "$payload" "$WEBHOOK"
