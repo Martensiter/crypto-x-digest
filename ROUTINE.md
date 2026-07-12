@@ -31,9 +31,15 @@ Routine（毎日, 依存はエージェントが手順1で導入）
      ```
      X_AUTH_TOKEN=...          # 40 桁セッショントークン（x.com の auth_token Cookie）
      X_CT0=...                 # 128 桁 CSRF トークン（ct0 Cookie）
-     DISCORD_BRIDGE_URL=...    # Discord 投稿ブリッジの Webhook URL
+     DISCORD_BRIDGE_URL=...    # ダイジェスト専用チャンネル（例 #x-digest）宛のブリッジ Webhook URL
      ```
      ※env は「その環境を編集できる人に見える」点に注意。
+   - **投稿先チャンネルについて**: ダイジェストは専用チャンネル（例 `#x-digest`）に流す運用。
+     `DISCORD_BRIDGE_URL` はダイジェスト専用の env で、他リポの通知（`DISCORD_WEBHOOK_PUSH` /
+     `_ALERTS` / `_ROUTINE`）とはコード上分離済み。チャンネルを移すときは Discord 側で
+     **ブリッジ（またはその先の Webhook）の宛先チャンネルを付け替える**だけでよい
+     （Discord のチャンネル設定 → 連携サービス → 対象 Webhook を編集してチャンネルを変更、
+     または新チャンネルに Webhook を作ってブリッジの転送先を差し替え）。コード変更は不要。
    - **`X_SEARCH_QUERY_ID` は env に設定しない**（空のままにする）。queryId は `FEATURES` と
      同一バンドルから採る必要があり、コード(`scripts/fetch_search.py`)が正本。env に古い値を入れると
      コードの正しい既定を上書きして `GRAPHQL_VALIDATION_FAILED` を起こす（実際それで詰まった）。

@@ -1,4 +1,4 @@
-# Notify Slack on push. Excludes the auto-checkpoint branches the Stop hook
+# Notify Discord on push. Excludes the auto-checkpoint branches the Stop hook
 # force-pushes (wip/checkpoint/**) to avoid notification spam.
 name: Notify on Push
 
@@ -9,5 +9,7 @@ on:
 
 jobs:
   notify:
-    uses: ./.github/workflows/notify-slack-reusable.yml
+    uses: ./.github/workflows/notify-discord-reusable.yml
+    with:
+      channel: push
     secrets: inherit
