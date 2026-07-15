@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "73e15fd3",
+    "description": "暗号資産業界動向の日次ダイジェスト生成とDiscord投稿",
+    "branch": "",
+    "context": "",
+    "status": "completed",
+    "created_at": "2026-07-15T00:05:42.812169",
+    "completed_at": "2026-07-15T00:10:38.513294"
+  }
+]
