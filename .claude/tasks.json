@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "451351e2",
+    "description": "暗号資産の業界動向ダイジェストを取得・生成しDiscordに投稿",
+    "branch": "",
+    "context": "",
+    "status": "completed",
+    "created_at": "2026-08-23T00:05:36.697009",
+    "completed_at": "2026-08-23T00:10:20.223429"
+  }
+]
