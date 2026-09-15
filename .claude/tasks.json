@@ -4,8 +4,8 @@
     "description": "毎日の暗号資産ダイジェスト生成・Discord投稿（スケジュール実行）",
     "branch": "",
     "context": "",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-09-15T00:06:17.217280",
-    "completed_at": null
+    "completed_at": "2026-09-15T00:10:21.266060"
   }
 ]
